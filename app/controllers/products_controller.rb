@@ -17,22 +17,22 @@ class ProductsController < ApplicationController
     page = params[:page] || 1
     #@featured_products = Cache.get 'featured_prod_8'
     unless @featured_products
-      @featured_products = Product.find( :all, {:limit => 8, :conditions => ['category_id = 272'], :order => 'msrp ASC', :include => :product_images})
+      @featured_products = Product.all.where('category_id = 272').includes(:product_images).order('msrp ASC').limit(8)
     #  Cache.put 'featured_prod_8', @featured_products
     end
-    @new_products = Cache.get 'new_prod_8'
+    #@new_products = Cache.get 'new_prod_8'
     unless @new_products
-      @new_products = Product.find( :all, {:limit => 8, :order => 'created_at DESC', :include => :product_images})
+      @new_products = Product.all.includes(:product_images).order('created_at DESC').limit(8)
     #  Cache.put 'new_prod_8', @new_products
     end
-    @top_sellers = Cache.get 'top_seller_8'
+    #@top_sellers = Cache.get 'top_seller_8'
     unless @top_sellers
-      @top_sellers  = Product.find( :all, {:limit => 8, :conditions => [ 'category_id in (564, 567)'], :order => 'msrp, created_at DESC', :include => :product_images})
+      @top_sellers = Product.all.where('category_id in (564, 567)').includes(:product_images).order('msrp, created_at DESC').limit(8)
     #  Cache.put 'top_seller_8', @top_sellers
     end
-    @recommended = Cache.get 'recommended_8'
+    #@recommended = Cache.get 'recommended_8'
     unless @recommended
-      @recommended = Product.find( :all, {:limit => 8, :conditions => [ 'category_id = 274'], :order => 'msrp, created_at DESC', :include => :product_images})
+      @recommended = Product.all.where('category_id = 274').includes(:product_images).order('msrp, created_at DESC').limit(8)
     #  Cache.put 'recommended_8', @recommended
     end
     respond_to do |format|

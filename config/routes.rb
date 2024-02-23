@@ -29,6 +29,9 @@ Rails.application.routes.draw do
   get '/featured', :controller => 'products', :action => 'featured', :as => 'featured'
   get '/top_sellers', :controller => 'products', :action => 'top_sellers', :as => 'top_sellers'
   get '/recommended', :controller => 'products', :action => 'recommended', :as => 'recommended'
+  get '/about', :controller => 'about', :action => 'index'
+  get '/contact', :controller => 'about', :action => 'contact'
+  get '/policy', :controller => 'about', :action => 'policies'
 
   resource :session
   #map.resource :manufacturers

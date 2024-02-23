@@ -5,14 +5,15 @@ class Product < ActiveRecord::Base
   @@per_page = 24
   belongs_to :ds_vendor, :polymorphic => true
   belongs_to :category
-  has_many :product_images, :order => 'width desc'
-  has_one :product_image, :conditions => { :hero => true }
+  has_many :product_images, -> { order('width desc') }
+  has_one :product_image, -> { where( :hero => true ) }
 
 #  validates_uniqueness_of :title
   DS_VENDORS = [ 'Dsdi' ]
   BUCKET = 'buymeyo_prod'
 
   before_save :sanitize_manufacturer
+
 
   def sanitize_manufacturer
     self.manufacturer = Product.sanitize(self.manufacturer)
