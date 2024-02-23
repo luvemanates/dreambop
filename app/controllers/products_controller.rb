@@ -86,7 +86,7 @@ class ProductsController < ApplicationController
   # GET /products/1
   # GET /products/1.xml
   def show
-    @product = Cache.get 'product_' + params[:id].to_s
+    #@product = Cache.get 'product_' + params[:id].to_s
     unless @product
       begin
         @product = Product.find(params[:id], :include => [:ds_vendor, :product_images])
@@ -95,9 +95,9 @@ class ProductsController < ApplicationController
         flash[:notice] = "I'm sorry. We couldn't find the product you were looking for"
         redirect_to '/' and return 
       end
-      Cache.put 'product_' + params[:id].to_s, @product
+    #  Cache.put 'product_' + params[:id].to_s, @product
     end
-    @breadcrumb = Cache.get 'product_' + params[:id].to_s + '_breadcrumb'
+    #@breadcrumb = Cache.get 'product_' + params[:id].to_s + '_breadcrumb'
     unless @breadcrumb
       @breadcrumb = @product.category.breadcrumb
       Cache.put 'product_' + params[:id].to_s + '_breadcrumb', @breadcrumb
