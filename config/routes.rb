@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   post '/search/post', :controller => 'search', :action => 'post', :via => 'post', :as => 'search_post'
   get '/search/:id', :controller => 'search', :action => 'show', :via => 'get', :as => 'search'
   get '/categories/:id', :controller => 'categories', :action => 'index', :as => 'categories'
-  #map.manufacturer '/manufacturers/:id', :controller => 'manufacturers', :action => 'show'
+  get '/manufacturers/:id', :controller => 'manufacturers', :action => 'show'
   #map.manufacturers_index '/manufacturers', :controller => 'manufacturers', :action => 'index'
   get '/categories/sub/:id', :controller => 'categories', :action => 'sub', :as => 'categories_sub'
   get '/new', :controller => 'products', :action => 'new', :as => 'new'
@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   get '/about', :controller => 'about', :action => 'index'
   get '/contact', :controller => 'about', :action => 'contact'
   get '/policy', :controller => 'about', :action => 'policies'
+  get '/fb_coupon', :controller => 'about', :action => 'facebook_coupon'
 
   resource :session
   #map.resource :manufacturers

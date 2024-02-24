@@ -86,23 +86,12 @@ class ProductsController < ApplicationController
   # GET /products/1
   # GET /products/1.xml
   def show
-    #@product = Cache.get 'product_' + params[:id].to_s
-    unless @product
-      begin
-        @product = Product.find(params[:id], :include => [:ds_vendor, :product_images])
-        @product = ProductDecorator.new(@product)
-      rescue
-        flash[:notice] = "I'm sorry. We couldn't find the product you were looking for"
-        redirect_to '/' and return 
-      end
-    #  Cache.put 'product_' + params[:id].to_s, @product
-    end
-    #@breadcrumb = Cache.get 'product_' + params[:id].to_s + '_breadcrumb'
-    unless @breadcrumb
+    @product = Product.where(:id => params[:id]).includes(:ds_vendor, :product_images, :category).first
+      puts 'product is ' + @product.title.to_s
+      puts 'category is ' + @product.category.to_s
       @breadcrumb = @product.category.breadcrumb
-      Cache.put 'product_' + params[:id].to_s + '_breadcrumb', @breadcrumb
-    end
-    @related_products = Product.find(:all, :conditions => [ 'products.manufacturer = ? and products.id != ?', @product.manufacturer, @product.id], :limit => 4, :include => :product_images) 
+      #Cache.put 'product_' + params[:id].to_s + '_breadcrumb', @breadcrumb
+    @related_products = Product.all.where( [ 'products.manufacturer = ? and products.id != ?', @product.manufacturer, @product.id]).includes(:product_images).limit(4)
 
     respond_to do |format|
       format.html # show.html.erb
