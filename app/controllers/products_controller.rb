@@ -1,9 +1,7 @@
 class ProductsController < ApplicationController
   def feed
-    @products = Cache.get 'products_feed' 
-    unless @products
-      @products = Product.find(:all, :limit => 10)
-      Cache.put 'products_feed', @products
+    @products = Rails.cache.fetch( 'products_feed') do
+      Product.find(:all, :limit => 10)
     end
     respond_to do |format|
       format.rss  { render :layout => false }
@@ -15,25 +13,17 @@ class ProductsController < ApplicationController
   # GET /products.xml
   def index
     page = params[:page] || 1
-    #@featured_products = Cache.get 'featured_prod_8'
-    unless @featured_products
-      @featured_products = Product.all.where('category_id = 272').includes(:product_images).order('msrp ASC').limit(8)
-    #  Cache.put 'featured_prod_8', @featured_products
+    @featured_products = Rails.cache.fetch('featured_prod_8') do
+      Product.all.where('category_id = 272').includes(:product_images).order('msrp ASC').limit(8)
     end
-    #@new_products = Cache.get 'new_prod_8'
-    unless @new_products
-      @new_products = Product.all.includes(:product_images).order('created_at DESC').limit(8)
-    #  Cache.put 'new_prod_8', @new_products
+    @new_products = Rails.cache.fetch( 'new_prod_8') do
+      Product.all.includes(:product_images).order('created_at DESC').limit(8)
     end
-    #@top_sellers = Cache.get 'top_seller_8'
-    unless @top_sellers
-      @top_sellers = Product.all.where('category_id in (564, 567)').includes(:product_images).order('msrp, created_at DESC').limit(8)
-    #  Cache.put 'top_seller_8', @top_sellers
+    @top_sellers = Rails.cache.fetch( 'top_seller_8' ) do
+      Product.all.where('category_id in (564, 567)').includes(:product_images).order('msrp, created_at DESC').limit(8)
     end
-    #@recommended = Cache.get 'recommended_8'
-    unless @recommended
-      @recommended = Product.all.where('category_id = 274').includes(:product_images).order('msrp, created_at DESC').limit(8)
-    #  Cache.put 'recommended_8', @recommended
+    @recommended = Rails.cache.fetch( 'recommended_8' ) do
+      Product.all.where('category_id = 274').includes(:product_images).order('msrp, created_at DESC').limit(8)
     end
     respond_to do |format|
       format.html # index.html.erb
@@ -44,20 +34,16 @@ class ProductsController < ApplicationController
   def featured
     @section_title = "FEATURED PRODUCTS"
     page = params[:page] || 1
-    @products = Cache.get 'featured_prod_pg_' + page.to_s
-    unless @products
-      @products = Product.paginate( {:page => page, :conditions => ['category_id = 272'], :order => 'msrp ASC', :include => :product_images})
-      Cache.put 'featured_prod_pg_' + page.to_s, @products
+    @products = Rails.cache.fetch( 'featured_prod_pg_' + page.to_s ) do
+      Product.where('category_id = 272').order('msrp ASC').includes(:product_images).paginate(:page => page)
     end
   end
 
   def new
     @section_title = "NEWEST PRODUCTS"
     page = params[:page] || 1
-    @products = Cache.get 'newest_prod_pg_' + page.to_s
-    unless @products
-      @products = Product.paginate( { :page => page, :order => 'created_at DESC', :include => :product_images})
-      Cache.put 'newest_prod_pg_' + page.to_s, @products
+    @products = Rails.cache.fetch( 'newest_prod_pg_' + page.to_s) do
+      Product.all.order('created_at DESC').includes(:product_images).paginate(:page => page)
     end
     render :featured
   end
@@ -65,10 +51,8 @@ class ProductsController < ApplicationController
   def top_sellers
     @section_title = "TOP SELLERS"
     page = params[:page] || 1
-    @products = Cache.get 'top_prod_pg_' + page.to_s
-    unless @products
-      @products = Product.paginate( { :page => page, :conditions => [ 'category_id in (564, 567)'], :order => 'msrp ASC', :include => :product_images})
-      Cache.put 'top_prod_pg_' + page.to_s, @products
+    @products = Rails.cache.fetch( 'top_prod_pg_' + page.to_s ) do
+      Product.where('category_id in (564, 567)').order('msrp ASC').includes(:product_images).paginate(:page => page)
     end
     render :featured
   end
@@ -76,10 +60,8 @@ class ProductsController < ApplicationController
   def recommended
     @section_title = "RECOMMENDED PRODUCTS"
     page = params[:page] || 1
-    @products = Cache.get 'rec_prod_pg_' + page.to_s
-    unless @products
-      @products = Product.paginate( { :page => page, :conditions => [ 'category_id = 274'], :order => 'msrp, created_at DESC', :include => :product_images})
-      Cache.put 'rec_prod_pg_' + page.to_s, @products
+    @products = Rails.cache.fetch( 'rec_prod_pg_' + page.to_s ) do
+      Product.where('category_id = 274').order('msrp, created_at DESC').includes(:product_images).paginate(:page => page)
     end
     render :featured
   end
@@ -89,8 +71,9 @@ class ProductsController < ApplicationController
     @product = Product.where(:id => params[:id]).includes(:ds_vendor, :product_images, :category).first
       puts 'product is ' + @product.title.to_s
       puts 'category is ' + @product.category.to_s
-      @breadcrumb = @product.category.breadcrumb
-      #Cache.put 'product_' + params[:id].to_s + '_breadcrumb', @breadcrumb
+      Rails.cache.fetch( 'product_' + params[:id].to_s + '_breadcrumb') do
+        @breadcrumb = @product.category.breadcrumb
+      end
     @related_products = Product.all.where( [ 'products.manufacturer = ? and products.id != ?', @product.manufacturer, @product.id]).includes(:product_images).limit(4)
 
     respond_to do |format|
