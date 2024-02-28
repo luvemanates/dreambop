@@ -1,10 +1,8 @@
 class ManufacturersController < ApplicationController
 
   def index
-    @manufacturers = Cache.get 'manufacturers' 
-    unless @manufacturers
-      @manufacturers = Product.find(:all, :select => 'DISTINCT manufacturer', :include => :product_images) 
-      Cache.put 'manufacturers', @manufacturers
+    @manufacturers = Rails.cache.fetch( 'manufacturers' ) do 
+      Product.all.select( 'DISTINCT manufacturer').includes(:product_images) 
     end
   end
 
@@ -12,10 +10,8 @@ class ManufacturersController < ApplicationController
     redirect_to :action => :index and return if params[:id].nil? or params[:id].empty?
     @manufacturer = params[:id].gsub(/\+/, ' ')
     page = params[:page] || 1
-    @products = Cache.get 'manufacturer_' + params[:id] + '_products_page' + page.to_s
-    unless @products
-      @products = Product.paginate( { :page => page, :conditions => [ 'manufacturer = ?', @manufacturer], :order => 'msrp ASC', :include => :product_images})
-      Cache.put 'manufacturer_' + params[:id] + '_products_page' + page.to_s, @products
+    @products = Rails.cache.fetch( 'manufacturer_' + params[:id] + '_products_page' + page.to_s ) do
+      Product.where(['manufacturer = ?', @manufacturer]).order('msrp ASC').includes(:product_images).paginate(:page => page)
     end
   end
 
