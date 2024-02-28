@@ -80,7 +80,7 @@
     Like this page and get money off your purchase. Read more about <%= link_to 'the dreambop facebook coupon', :action => 'facebook_coupon', :controller => 'about' %>
   </div>
   <div id="add-to-cart">
-    <%= form_for @product, :url => { :action => :update, :controller => :carts, :id => @product }, :method => :patch do |f| %>
+    <%= form_for @product, :url => { :action => :update, :controller => :cart, :id => @product }, :method => :patch do |f| %>
       <%= submit_tag 'Add to cart', :src => '/images/button_add_to_cart.jpg', :type => 'image' %> 
     <% end %>
    </div>

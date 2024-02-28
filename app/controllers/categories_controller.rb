@@ -3,22 +3,16 @@ class CategoriesController < ApplicationController
   def sub
     @category = params[:id]
     @category = "all" if @category.nil? or @category == '' or @category == "All"
-    @category = Cache.get 'category_' + @category
-    unless @category
-      @category = Category.find_by_name(params[:id])
-      Cache.put 'category_' + @category.name, @category
+    @category = Rails.cache.fetch( 'category_' + @category) do
+      Category.find_by_name(params[:id])
     end
 
-    @breadcrumb = Cache.get 'product_' + params[:id].to_s + '_breadcrumb'
-    unless @breadcrumb
-      @breadcrumb = @category.breadcrumb
-      Cache.put 'product_' + params[:id].to_s + '_breadcrumb', @breadcrumb
+    @breadcrumb = Rails.cache.fetch( 'product_' + params[:id].to_s + '_breadcrumb') do
+      @category.breadcrumb
     end
 
-    @categories = Cache.get 'category_' + @category.name + '_children'
-    unless @categories
-      @categories = @category.children
-      Cache.put 'category_' + @category.name + '_children', @categories
+    @categories = Rails.cache.fetch( 'category_' + @category.name + '_children') do
+      @category.children
     end
   end
 
@@ -26,33 +20,35 @@ class CategoriesController < ApplicationController
     page = params[:page] || 1
     @category = params[:id]
     @categories = []
-    @category = "all" if @category.nil? or @category == '' or @category == "All"
+    @category = Category.where( :name => "all").first if @category.nil? or @category == '' or @category == "All"
 
-    @category = Cache.get 'category_' + @category
-    unless @category
-      @category = Category.find_by_name(Category.db_safe(params[:id]))
-      if @category.blank?
-        @category = Category.find_by_name(params[:id])
+    @category = Rails.cache.fetch('category_' + @category) do
+      cat = Category.where(:name => Category.db_safe(params[:id])).first
+      cat = @category if cat.nil?
+      cat
+    end
+    if @category.blank?
+      @category = Category.where(:name => params[:id]).first
+    end
+    #@category = Rails.cache.fetch('category_' + @category.linkify) do
+    #  @category
+    #end
+
+    #@categories = Rails.cache.fetch( 'category_' + @category.linkify + '_allchildren' ) do
+    #  @category.all_children << @category
+    #  @categoay.all_children
+    #end
+    @categories = @category.all_children
+
+    @products = Rails.cache.fetch( 'category_' + @category.linkify + '_products_page_' + page.to_s) do
+      Product.where(['category_id in (?)', @categories]).order('msrp DESC').includes(:product_image).paginate(:page => page)
+    end
+
+    @breadcrumb = Rails.cache.fetch( 'product_' + params[:id].to_s + '_breadcrumb' ) do
+      @category.breadcrumb
+      Rails.cache.fetch('product_' + @category.linkify + '_breadcrumb') do
+        @category.breadcrumb
       end
-      Cache.put 'category_' + @category.linkify, @category
-    end
-
-    @categories = Cache.get 'category_' + @category.linkify + '_allchildren'
-    unless @categories
-      @categories = @category.all_children << @category
-      Cache.put 'category_' + @category.linkify + '_allchildren', @categories
-    end
-
-    @products = Cache.get 'category_' + @category.linkify + '_products_page_' + page.to_s
-    unless @products
-      @products = Product.paginate( { :page => page, :conditions => ['category_id in (?)', @categories], :order => 'msrp DESC', :include => :product_images})
-      Cache.put 'category_' + @category.linkify + '_products_page_' + page.to_s, @products
-    end
-
-    @breadcrumb = Cache.get 'product_' + params[:id].to_s + '_breadcrumb'
-    unless @breadcrumb
-      @breadcrumb = @category.breadcrumb
-      Cache.put 'product_' + @category.linkify + '_breadcrumb', @breadcrumb
     end
   end
 

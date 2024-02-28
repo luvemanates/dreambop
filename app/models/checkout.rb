@@ -1,5 +1,5 @@
-require 'active_shipping'
-include ActiveMerchant::Shipping
+#require 'active_shipping'
+#include ActiveMerchant::Shipping
 
 class Checkout
 
@@ -23,7 +23,7 @@ class Checkout
         @tax = 0
         @total = @subtotal + @shipping_cost + @tax
       else
-        @cart = Cart.find_by_session_id(session_id)
+        @cart = Cart.where(:session_id => session_id)
         @address = shipping_address
         calculate_shipping_subtotal
         calculate_tax
@@ -59,6 +59,7 @@ private
     @subtotal = 0.0
     total_ship_cost = 0.0
     return if @cart.nil?
+    return if @cart.products.nil?
     products = @cart.products
     destination = Location.new( :country => 'US',
                             :state => STATE_CODES[@address.state.upcase],

@@ -1,10 +1,10 @@
 class CartController < ApplicationController
-  before_filter :get_cart
+  before_action :get_cart
 
   def show
     @shipping_address = nil
     if current_user.nil?
-      @shipping_address = ShippingAddress.find_by_session_id(request.session_options[:id])
+      @shipping_address = ShippingAddress.where(:session_id => request.session_options[:id])
     end
     @checkout = Checkout.new(current_user, request.session_options[:id], @shipping_address)
   end
@@ -34,27 +34,23 @@ class CartController < ApplicationController
 protected
   def get_cart
     #@cart = Cache.get 'user_' + current_user.id.to_s + '_cart'
-    unless @cart
-      if current_user.nil?
-        @cart = Cart.find_by_session_id(request.session_options[:id])
-        unless @cart
-          @cart = Cart.new(:user_id => 0, :session_id => request.session_options[:id])
-          @cart.save
-        end
-      else
-        @cart = current_user.cart
-        if @cart.nil?
-          @cart = Cart.new(:user => current_user)
-          @cart.save
-        end
+    #@cart = Rails.cache.fetch( 'user_' + current_user.id.to_s + '_cart')  unless current_user.nil?
+    if current_user.nil?
+      @cart = Cart.where(:session_id => request.session_options[:id])
+      unless @cart
+        @cart = Cart.new(:user_id => 0, :session_id => request.session_options[:id])
+        @cart.save
       end
-      #Cache.put 'user_' + current_user.id.to_s + '_cart', @cart
+    else
+      @cart = current_user.cart
+      if @cart.nil?
+        @cart = Cart.new(:user => current_user)
+        @cart.save
+      end
     end
-    @cart_products = Cache.get 'cart_' + @cart.id.to_s
-    unless @cart_products
-      @cart_products = @cart.cart_products
-      Cache.put 'cart_' + @cart.id.to_s, @cart_products
-    end
+    #@cart_products = Rails.cache.fetch( 'cart_' + @cart.id.to_s) do
+    #@cart.cart_products
+    #end
   end
 
 end

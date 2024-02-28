@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
-  resource :cart
+
+  devise_for :users, controllers: { sessions: 'users/sessions' }
+
+  resource :cart, :controller => 'cart'
   resources :orders do
     collection do
       post :paypal 
