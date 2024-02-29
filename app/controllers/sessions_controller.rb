@@ -1,6 +1,6 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
-  ssl_required :new, :create, :destroy
+  #before_action :ssl_required, :only => [ :new, :create, :destroy]
 
   # render new.erb.html
   def new

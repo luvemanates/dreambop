@@ -14,11 +14,14 @@ class Checkout
       if shipping_address.nil?
         @shipping_cost = 0
         @subtotal = 0 
-        @cart = Cart.find_by_session_id(session_id)
+        @cart = Cart.where(:session_id => session_id)
         if @cart
           @cart.products.each do |product|
             @subtotal += product.price
           end
+        else
+          @cart = @cart.new(:session_id => session_id)
+          @cart.save
         end
         @tax = 0
         @total = @subtotal + @shipping_cost + @tax

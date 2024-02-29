@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
 
+
+
+  constraints :protocol => "https" do
   devise_for :users, controllers: { sessions: 'users/sessions' }
+  end
 
   resource :cart, :controller => 'cart'
   resources :orders do

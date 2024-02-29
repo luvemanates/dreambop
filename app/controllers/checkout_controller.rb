@@ -1,6 +1,6 @@
 class CheckoutController < ApplicationController
-  before_filter :login_required
-  ssl_required :new, :select_address
+  before_action :login_required
+  #ssl_required :new, :select_address
 
   def select_address
     if params[:shipping_address].nil? or params[:shipping_address][:id].nil? or params[:shipping_address][:id].empty? 

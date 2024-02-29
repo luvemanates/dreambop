@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
-  before_filter :login_required, :only => [ :change_password, :index ]  
-  ssl_required :new, :create, :reset_password, :change_password
+  before_action :login_required, :only => [ :change_password, :index ]  
+  #before_action :ssl_required, :only => [ :new, :create, :reset_password, :change_password]
 
   def index
   end
