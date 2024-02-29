@@ -70,7 +70,7 @@
             <%= link_to 'browse', categories_sub_path('all') %>
           </div>
           <div class="menu-link">
-            <%= logged_in? ? link_to('my details', users_path) : link_to('my details', login_path)%> 
+            <%= user_signed_in? ? link_to('my details', users_path) : link_to('my details', login_path)%> 
           </div>
       </div>
       <div id="body-text">

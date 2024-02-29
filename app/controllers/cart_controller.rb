@@ -36,6 +36,7 @@ protected
     puts 'in get_cart'
     puts 'session id is ' + request.session[:id].to_s
     puts 'esession id is ' + session[:id].to_s
+    puts 'session session id is ' + request.session[:session_id].to_s
     #@cart = Cache.get 'user_' + current_user.id.to_s + '_cart'
     #@cart = Rails.cache.fetch( 'user_' + current_user.id.to_s + '_cart')  unless current_user.nil?
     if current_user.nil?

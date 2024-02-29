@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'authenticated_system'
 
 class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,

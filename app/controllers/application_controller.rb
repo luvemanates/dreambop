@@ -1,10 +1,10 @@
-require 'authenticated_system.rb'
+#require 'authenticated_system.rb'
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  include AuthenticatedSystem
-  include SslRequirement
+#  include AuthenticatedSystem
+#  include SslRequirement
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
