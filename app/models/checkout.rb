@@ -64,10 +64,12 @@ private
     @shipping_cost = 0 and return if @cart.nil?
     @shipping_cost = 0 and return if @cart.products.nil?
     products = @cart.products
+=begin
     destination = Location.new( :country => 'US',
                             :state => STATE_CODES[@address.state.upcase],
                             :city => @address.city,
                             :postal_code => @address.zip)
+=end
     products.each do |product|
       @subtotal += product.price
       unless @address.nil?
@@ -83,6 +85,7 @@ private
       #puts 'sender zip is ' + sender_zip
         #ups = Shipping::UPS.new(:city => @address.city, :state => @address.state, :zip => @address.zip, :sender_zip => sender_zip, :weight => product.weight, :ups_license_number => 'F0F0F0F0F0F0F0', :ups_user => 'thedude', :ups_password => 'whiterussian',  :service_type => '3day', :packaging_type => 'your_packaging')
         #total_ship_cost += #ups.price
+=begin
         origin = Location.new(      :country => 'US',
                             #:state => 'CA',
                             #:city => 'Beverly Hills',
@@ -94,6 +97,7 @@ private
                                       :units => :imperial)        # not grams, not centimetres
         ]
 
+=end
 
         #ups = UPS.new(:login => 'thedude', :password => 'whiterussian', :key => '0404040404040404')
         #response = ups.find_rates(origin, destination, packages)

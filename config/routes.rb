@@ -14,7 +14,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resource :credit_card
+  resource :credit_card do
+    get  :decision
+  end
 
   resources :shipping_addresses
 

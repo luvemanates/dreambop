@@ -34,7 +34,7 @@
       <td class="item_pic"><%= link_to(image_tag(product.image(75), :width => 75, :height => 75), product) %></td>
       <td><%= link_to(truncate(product.title, :lenth => 49), product) %></td>
       <td><%= number_to_currency(product.price) %></td>
-      <td><%= button_to 'Remove From Cart', { :action => :delete, :controller => :cart, :id => cart_product}, :method => :delete %></td>
+      <td><%= button_to 'Remove From Cart', { :action => :destroy, :controller => :cart, :id => cart_product}, data: {:turbo_method => 'delete'} %></td>
     </tr>
   <% end %>
   <% if @checkout %>
