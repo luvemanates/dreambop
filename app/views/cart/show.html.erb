@@ -25,6 +25,7 @@
       <th>&nbsp;</th>
     </tr>
 
+<% unless @cart_products.nil? %>
   <% @cart_products.each do |cart_product| 
        product = cart_product.product
        next if product.nil?
@@ -152,5 +153,6 @@
     <% end %>
 
     <% end %>
+  <% end %>
   </table>
 </div>

@@ -14,19 +14,19 @@ class Checkout
       if shipping_address.nil?
         @shipping_cost = 0
         @subtotal = 0 
-        @cart = Cart.where(:session_id => session_id)
+        @cart = Cart.where(:session_id => session_id.to_s).first
         if @cart
           @cart.products.each do |product|
             @subtotal += product.price
           end
         else
-          @cart = @cart.new(:session_id => session_id)
+          @cart = @cart.new(:session_id => session_id.to_s)
           @cart.save
         end
         @tax = 0
         @total = @subtotal + @shipping_cost + @tax
       else
-        @cart = Cart.where(:session_id => session_id)
+        @cart = Cart.where(:session_id => session_id).first
         @address = shipping_address
         calculate_shipping_subtotal
         calculate_tax
@@ -61,8 +61,8 @@ private
     total_weight = 0
     @subtotal = 0.0
     total_ship_cost = 0.0
-    return if @cart.nil?
-    return if @cart.products.nil?
+    @shipping_cost = 0 and return if @cart.nil?
+    @shipping_cost = 0 and return if @cart.products.nil?
     products = @cart.products
     destination = Location.new( :country => 'US',
                             :state => STATE_CODES[@address.state.upcase],
@@ -109,6 +109,7 @@ private
   def calculate_tax
     @tax = 0
     unless @address.nil?
+      return unless @address.respond_to?(:state)
       if @address.state == 'California' or @address.state == 'CA'  
         @tax = (@subtotal + @shipping_cost) * 0.0825 
       end
